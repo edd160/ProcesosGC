@@ -1,0 +1,92 @@
+<html>
+<meta charset="UTF-8">
+<!-- Styles -->
+<style>
+#chartdiv {
+  width: 100%;
+  height: 500px
+}
+
+</style>
+
+<!-- Resources -->
+<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/geodata/mexicoLow.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+
+<!-- Chart code -->
+<script>
+am4core.ready(function() {
+
+// Themes begin
+am4core.useTheme(am4themes_animated);
+// Themes end
+
+ // Create map instance
+var chart = am4core.create("chartdiv", am4maps.MapChart);
+
+// Set map definition
+chart.geodata = am4geodata_mexicoLow;
+
+// Set projection
+//chart.projection = new am4maps.projections.AlbersUsa();
+
+// Create map polygon series
+var polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
+
+//Set min/max fill color for each area
+polygonSeries.heatRules.push({
+  property: "fill",
+  target: polygonSeries.mapPolygons.template,
+  min: chart.colors.getIndex(1).brighten(1),
+  max: chart.colors.getIndex(1).brighten(-0.3)
+});
+
+// Make map load polygon data (state shapes and names) from GeoJSON
+polygonSeries.useGeodata = true;
+
+// Set heatmap values for each state
+polygonSeries.data = [
+  { id: 'MX-AGU', value:3343 },{ id: 'MX-BCN', value:4916 },{ id: 'MX-BCS', value:1487 },{ id: 'MX-CAM', value:2885 },{ id: 'MX-CHP', value:4903 },{ id: 'MX-CHH', value:6219 },{ id: 'MX-CMX', value:60776 },{ id: 'MX-COA', value:12145 },{ id: 'MX-COL', value:1586 },{ id: 'MX-DUR', value:3495 },{ id: 'MX-MEX', value:56430 },{ id: 'MX-GUA', value:13329 },{ id: 'MX-GRO', value:5283 },{ id: 'MX-HID', value:5284 },{ id: 'MX-JAL', value:30804 },{ id: 'MX-MIC', value:4893 },{ id: 'MX-MOR', value:6411 },{ id: 'MX-NAY', value:1945 },{ id: 'MX-NLE', value:38545 },{ id: 'MX-OAX', value:5020 },{ id: 'MX-PUE', value:17763 },{ id: 'MX-QUE', value:10836 },{ id: 'MX-ROO', value:12306 },{ id: 'MX-SLP', value:6247 },{ id: 'MX-SIN', value:8653 },{ id: 'MX-SON', value:10982 },{ id: 'MX-TAB', value:7741 },{ id: 'MX-TAM', value:10256 },{ id: 'MX-TLA', value:1767 },{ id: 'MX-VER', value:14140 },{ id: 'MX-YUC', value:11097 },{ id: 'MX-ZAC', value:3236 }
+];
+
+// Set up heat legend
+let heatLegend = chart.createChild(am4maps.HeatLegend);
+heatLegend.series = polygonSeries;
+heatLegend.align = "right";
+heatLegend.valign = "bottom";
+heatLegend.width = am4core.percent(20);
+heatLegend.marginRight = am4core.percent(4);
+heatLegend.minValue = 0;
+heatLegend.maxValue = 40000000;
+
+// Set up custom heat map legend labels using axis ranges
+var minRange = heatLegend.valueAxis.axisRanges.create();
+minRange.value = heatLegend.minValue;
+minRange.label.text = "Pocos";
+var maxRange = heatLegend.valueAxis.axisRanges.create();
+maxRange.value = heatLegend.maxValue;
+maxRange.label.text = "Muchos!";
+
+// Blank out internal heat legend value axis labels
+heatLegend.valueAxis.renderer.labels.template.adapter.add("text", function(labelText) {
+  return "";
+});
+
+// Configure series tooltip
+var polygonTemplate = polygonSeries.mapPolygons.template;
+polygonTemplate.tooltipText = "{name}: {value}";
+polygonTemplate.nonScalingStroke = true;
+polygonTemplate.strokeWidth = 0.5;
+
+// Create hover state and set alternative fill color
+var hs = polygonTemplate.states.create("hover");
+hs.properties.fill = am4core.color("#3c5bdc");
+
+}); // end am4core.ready()
+</script>
+
+<!-- HTML -->
+<div id="chartdiv"></div>
+</html>
